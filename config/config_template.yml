@@ -1,0 +1,13 @@
+db:
+  filename: ./data/syncat.db
+sync:
+  directories:
+    - ./data/sync1
+    - ./data/sync2
+    - ./data/sync3
+protocol:
+  buffer_size: 4096
+  timeout: 10
+  ping_interval: 5
+auth:
+  token: <your_token>
