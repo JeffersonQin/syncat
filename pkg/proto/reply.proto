@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package top.gyrojeff.syncat.proto;
+
+option go_package = "./pkg/proto;pb";
+
+message SyncatReplyRequestBody {
+  bool success = 1;
+  string clientUuid = 2;
+  string message = 3;
+}

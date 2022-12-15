@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package top.gyrojeff.syncat.proto;
+
+option go_package = "./pkg/proto;pb";
+
+message SyncatAuthRequestBody {
+    string clientUuid = 1;
+    string token = 2;
+}
