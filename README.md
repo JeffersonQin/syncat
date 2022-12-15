@@ -1,3 +1,5 @@
+[![Go Report Card](https://goreportcard.com/badge/github.com/JeffersonQin/syncat)](https://goreportcard.com/report/github.com/JeffersonQin/syncat)
+
 # syncat
 
 > Files should never have been synced by OneDrive, Qsync, iCloud automatically ...
