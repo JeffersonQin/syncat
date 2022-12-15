@@ -65,6 +65,9 @@ func LoadConfig() error {
 	}(configFile)
 	// Read config file
 	configBytes, err := io.ReadAll(configFile)
+	if err != nil {
+		return err
+	}
 	// Unmarshal config file
 	err = yaml.Unmarshal(configBytes, &config)
 	if err != nil {
