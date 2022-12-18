@@ -69,7 +69,7 @@ func StartSyncatServer() error {
 			return err
 		}
 		idleTimeoutConn := &syncnet.IdleTimeoutConn{
-			TCPConn:     *conn,
+			TCPConn:     conn,
 			IdleTimeout: time.Duration(config.GetConfig().Protocol.Timeout) * time.Second,
 		}
 		idleTimeoutConn.Log("Connection established")

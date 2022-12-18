@@ -7,7 +7,9 @@ import (
 
 // IdleTimeoutConn is the connection with idle timeout
 type IdleTimeoutConn struct {
-	net.TCPConn
+	// TCPConn is the underlying TCP connection
+	*net.TCPConn
+	// IdleTimeout is the timeout for idle connection
 	IdleTimeout time.Duration
 }
 
