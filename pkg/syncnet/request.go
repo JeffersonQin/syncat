@@ -8,26 +8,37 @@ import (
 	"github.com/golang/protobuf/proto"
 )
 
+// SyncatRequest is the interface for all syncat request
 type SyncatRequest interface {
+	// GetType Get the type of the request
 	GetType() PacketType
+	// GetLength Get the length of the request
 	GetLength() uint64
+	// Handle the request
 	Handle(conn *IdleTimeoutConn) error
+	// Send the request
 	Send(conn *IdleTimeoutConn) error
 }
 
+// SyncatRequestHeader is the header of all syncat request
 type SyncatRequestHeader struct {
+	// PacketType is the type of the packet
 	PacketType PacketType
-	Length     uint64
+	// Length is the length of the packet
+	Length uint64
 }
 
+// GetType Get the type of the request from header info, default method for all request
 func (r *SyncatRequestHeader) GetType() PacketType {
 	return r.PacketType
 }
 
+// GetLength Get the length of the request from header info, default method for all request
 func (r *SyncatRequestHeader) GetLength() uint64 {
 	return r.Length
 }
 
+// Send the request based on configured header info
 func (r *SyncatRequestHeader) Send(conn *IdleTimeoutConn) error {
 	data := make([]byte, TypeLength+SizeLength)
 	data[0] = byte(r.PacketType)
@@ -42,14 +53,17 @@ func (r *SyncatRequestHeader) Send(conn *IdleTimeoutConn) error {
 	return nil
 }
 
+// SyncatAckRequest is the request for ACK packet
 type SyncatAckRequest struct {
 	SyncatRequestHeader
 }
 
+// Handle ACK request does not need to be handled, the function is empty
 func (r *SyncatAckRequest) Handle(_ *IdleTimeoutConn) error {
 	return nil
 }
 
+// NewSyncatAckRequest Create a new SyncatAckRequest
 func NewSyncatAckRequest() *SyncatAckRequest {
 	return &SyncatAckRequest{
 		SyncatRequestHeader{
@@ -59,11 +73,18 @@ func NewSyncatAckRequest() *SyncatAckRequest {
 	}
 }
 
+// SyncatAuthRequest is the request for AUTH packet
 type SyncatAuthRequest struct {
 	SyncatRequestHeader
 	pb.SyncatAuthRequestBody
 }
 
+// Handle AUTH request
+// Authenticate the token and check whether the client is registered
+// If the client is not registered, auth will also fail
+// If the client field is empty, the client will be registered
+// REPLY packet will be sent back as response
+// AUTH request will only be sent by the client to the server when the connection is established
 func (r *SyncatAuthRequest) Handle(conn *IdleTimeoutConn) error {
 	data := make([]byte, r.Length)
 	_, err := conn.Read(data)
@@ -106,6 +127,7 @@ func (r *SyncatAuthRequest) Handle(conn *IdleTimeoutConn) error {
 	return err
 }
 
+// Send the AUTH request
 func (r *SyncatAuthRequest) Send(conn *IdleTimeoutConn) error {
 	data, err := proto.Marshal(&r.SyncatAuthRequestBody)
 	if err != nil {
@@ -120,6 +142,7 @@ func (r *SyncatAuthRequest) Send(conn *IdleTimeoutConn) error {
 	return err
 }
 
+// NewSyncatAuthRequest Create a new SyncatAuthRequest
 func NewSyncatAuthRequest() (*SyncatAuthRequest, error) {
 	clientUuid, err := database.QueryClientUuid()
 	if err != nil {
@@ -137,11 +160,15 @@ func NewSyncatAuthRequest() (*SyncatAuthRequest, error) {
 	}, nil
 }
 
+// SyncatReplyRequest is the request for REPLY packet
 type SyncatReplyRequest struct {
 	SyncatRequestHeader
 	pb.SyncatReplyRequestBody
 }
 
+// Handle REPLY request
+// Check whether the auth is successful, and also update the client's uuid when newly registered
+// REPLY request will only be sent by the server to the client when the connection is established
 func (r *SyncatReplyRequest) Handle(conn *IdleTimeoutConn) error {
 	data := make([]byte, r.Length)
 	_, err := conn.Read(data)
@@ -160,6 +187,7 @@ func (r *SyncatReplyRequest) Handle(conn *IdleTimeoutConn) error {
 	}
 }
 
+// Send the REPLY request
 func (r *SyncatReplyRequest) Send(conn *IdleTimeoutConn) error {
 	data, err := proto.Marshal(&r.SyncatReplyRequestBody)
 	if err != nil {
@@ -174,6 +202,7 @@ func (r *SyncatReplyRequest) Send(conn *IdleTimeoutConn) error {
 	return err
 }
 
+// NewSyncatReplyRequest Create a new SyncatReplyRequest
 func NewSyncatReplyRequest(success bool, clientUUid string, message string) *SyncatReplyRequest {
 	return &SyncatReplyRequest{
 		SyncatRequestHeader{

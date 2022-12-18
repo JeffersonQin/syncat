@@ -6,6 +6,7 @@ import (
 	"golang.org/x/exp/slices"
 )
 
+// Wait for the certain kinds of packet, provided by typeList
 func Wait(conn *IdleTimeoutConn, typeList []PacketType) (SyncatRequest, error) {
 	request, err := RouteConn(conn)
 	if err != nil {
@@ -17,6 +18,7 @@ func Wait(conn *IdleTimeoutConn, typeList []PacketType) (SyncatRequest, error) {
 	return request, nil
 }
 
+// RouteConn wait for the next packet, parse the request header and identify which type of request it is
 func RouteConn(conn *IdleTimeoutConn) (SyncatRequest, error) {
 	headData := make([]byte, TypeLength+SizeLength)
 	count, err := conn.Read(headData)
