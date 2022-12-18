@@ -60,9 +60,9 @@ func LoadConfig() error {
 	if err != nil {
 		return err
 	}
-	defer func(configFile *os.File) {
+	defer func() {
 		_ = configFile.Close()
-	}(configFile)
+	}()
 	// Read config file
 	configBytes, err := io.ReadAll(configFile)
 	if err != nil {

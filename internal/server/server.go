@@ -58,14 +58,12 @@ func StartSyncatServer() error {
 	}
 	listener, err := net.ListenTCP("tcp", tcpAddr)
 	if err != nil {
-		_ = listener.Close()
 		return err
 	}
 	log.Println("Syncat server started at " + addr + "...")
 	for {
 		conn, err := listener.AcceptTCP()
 		if err != nil {
-			_ = conn.Close()
 			return err
 		}
 		idleTimeoutConn := &syncnet.IdleTimeoutConn{

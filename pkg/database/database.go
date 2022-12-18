@@ -70,7 +70,6 @@ func LoadDatabase() error {
 	}
 	f, err := os.OpenFile(dbConfig.Filename, os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
-		_ = f.Close()
 		return err
 	}
 	// Close db file
@@ -81,7 +80,6 @@ func LoadDatabase() error {
 	// Connect to the database
 	db, err = sql.Open("sqlite3", getDbConnectionString(dbConfig))
 	if err != nil {
-		_ = db.Close()
 		return err
 	}
 	// Ping
@@ -112,9 +110,9 @@ func QueryExistsClientUuid(uuid string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	defer func(row *sql.Rows) {
+	defer func() {
 		_ = row.Close()
-	}(row)
+	}()
 	return row.Next(), nil
 }
 
@@ -144,9 +142,9 @@ func QueryClientUuid() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer func(row *sql.Rows) {
+	defer func() {
 		_ = row.Close()
-	}(row)
+	}()
 	if !row.Next() {
 		return "", nil
 	}
